@@ -1,0 +1,97 @@
+@if (data; as dashboardData) {
+<div class="dashboard">
+  <header class="header card">
+    <div>
+      <h1>Dashboard</h1>
+      <p>{{ userEmail }}</p>
+    </div>
+    <button (click)="logout()">Logout</button>
+  </header>
+
+  <section class="summary-grid">
+    <article class="card">
+      <h2>Total income</h2>
+      <strong>{{ dashboardData.summary.total_income | currency: 'EUR' }}</strong>
+    </article>
+    <article class="card">
+      <h2>Total expenses</h2>
+      <strong>{{ dashboardData.summary.total_expenses | currency: 'EUR' }}</strong>
+    </article>
+    <article class="card">
+      <h2>Balance</h2>
+      <strong>{{ dashboardData.summary.balance | currency: 'EUR' }}</strong>
+    </article>
+  </section>
+
+  <section class="card">
+    <h2>Goal progress</h2>
+    <p>{{ progressPercentage }}% · Remaining: {{ dashboardData.goal.remaining_amount | currency: 'EUR' }}</p>
+    <div class="progress-track">
+      <div class="progress-fill" [style.width.%]="progressPercentage"></div>
+    </div>
+  </section>
+
+  <section class="two-col">
+    <article class="card">
+      <h2>Add transaction</h2>
+      <form [formGroup]="transactionForm" (ngSubmit)="addTransaction()" class="form-grid">
+        <input type="number" step="0.01" formControlName="amount" placeholder="Amount" />
+        <select formControlName="type">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <input type="text" formControlName="category" placeholder="Category (optional)" />
+        <input type="text" formControlName="description" placeholder="Description" />
+        <input type="date" formControlName="date" />
+        <button type="submit">Save transaction</button>
+      </form>
+
+      <h3>Recent transactions</h3>
+      <ul class="list">
+        @for (transaction of dashboardData.recent_transactions; track transaction.id) {
+          <li>
+            <span>{{ transaction.date | date }} · {{ transaction.description }}</span>
+            <strong>{{ transaction.amount | currency: 'EUR' }}</strong>
+          </li>
+        }
+      </ul>
+
+      <h3>All transactions</h3>
+      <ul class="list">
+        @for (transaction of transactions; track transaction.id) {
+          <li>
+            <span>{{ transaction.type }} · {{ transaction.description }}</span>
+            <div>
+              <strong>{{ transaction.amount | currency: 'EUR' }}</strong>
+              <button (click)="deleteTransaction(transaction.id)">Delete</button>
+            </div>
+          </li>
+        }
+      </ul>
+    </article>
+
+    <article class="card">
+      <h2>Add investment</h2>
+      <form [formGroup]="investmentForm" (ngSubmit)="addInvestment()" class="form-grid">
+        <input type="text" formControlName="name" placeholder="Investment name" />
+        <input type="number" step="0.01" formControlName="amount_invested" placeholder="Amount invested" />
+        <input type="number" step="0.01" formControlName="current_value" placeholder="Current value" />
+        <button type="submit">Save investment</button>
+      </form>
+
+      <h3>Investments</h3>
+      <ul class="list">
+        @for (investment of investments; track investment.id) {
+          <li>
+            <span>{{ investment.name }}</span>
+            <div>
+              <strong>{{ investment.profit_loss | currency: 'EUR' }}</strong>
+              <button (click)="deleteInvestment(investment.id)">Delete</button>
+            </div>
+          </li>
+        }
+      </ul>
+    </article>
+  </section>
+</div>
+}
